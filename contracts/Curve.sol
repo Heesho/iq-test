@@ -57,10 +57,10 @@ contract Curve is IEntropyConsumer, ReentrancyGuard, Ownable {
     address public community;
 
     IEntropy public entropy;
+    uint256 public maxIndex;
     uint256 public testPrice = 0.69 ether;
     uint256 public feeSplit = 20;
 
-    uint256 maxIndex;
     mapping(uint256 => uint256) public index_Score;
     mapping(uint256 => address) public score_Account;
     mapping(uint64 => address) public sequence_Account;
@@ -72,20 +72,21 @@ contract Curve is IEntropyConsumer, ReentrancyGuard, Ownable {
     error Curve__InvalidArray();
     error Curve__InvalidFeeSplit();
     error Curve__NotAuthorized();
+    error Curve__InsufficientPayment();
 
-    event Curve__ScoreAdded(address indexed account, uint256 indexed score);
-    event Curve__ScoreRemoved(address indexed account, uint256 indexed score);
-    event Curve__ScoreSet(uint256 indexed index, uint256 indexed score);
-    event Curve__MaxIndexSet(uint256 indexed maxIndex);
+    event Curve__ScoreAdded(address indexed account, uint256 score);
+    event Curve__ScoreRemoved(address indexed account, uint256 score);
+    event Curve__ScoreSet(uint256 indexed index, uint256 score);
+    event Curve__MaxIndexSet(uint256 maxIndex);
     event Curve__TestRequested(uint64 indexed sequenceNumber, address indexed account);
-    event Curve__Tested(address indexed account, uint256 indexed score);
-    event Curve__Distribute(uint256 indexed incentivesFee, uint256 indexed treasuryFee, uint256 indexed developerFee, uint256 indexed communityFee);
-    event Curve__TestPriceSet(uint256 indexed testPrice);
-    event Curve__FeeSplitSet(uint256 indexed feeSplit);
-    event Curve__IncentivesSet(address indexed incentives);
-    event Curve__TreasurySet(address indexed treasury);
-    event Curve__DeveloperSet(address indexed developer);
-    event Curve__CommunitySet(address indexed community);
+    event Curve__Tested(address indexed account, uint256 score);
+    event Curve__Distribute(uint256 incentivesFee, uint256 treasuryFee, uint256 developerFee, uint256 communityFee);
+    event Curve__TestPriceSet(uint256 testPrice);
+    event Curve__FeeSplitSet(uint256 feeSplit);
+    event Curve__IncentivesSet(address incentives);
+    event Curve__TreasurySet(address treasury);
+    event Curve__DeveloperSet(address developer);
+    event Curve__CommunitySet(address community);
 
     constructor(
         address _base,
@@ -145,8 +146,6 @@ contract Curve is IEntropyConsumer, ReentrancyGuard, Ownable {
         }
 
     }
-
-    receive() external payable {}
 
     function entropyCallback(uint64 sequenceNumber, address, bytes32 randomNumber) internal override {
         address account = sequence_Account[sequenceNumber];
