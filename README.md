@@ -1,2 +1,1 @@
-# cookie-clicker
 # iq-test
