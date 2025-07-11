@@ -12,6 +12,14 @@ contract RewardVault {
         vaultToken = _vaultToken;
     }
 
+    function getDelegateStake(address account, address delegate) external view returns (uint256) {
+        return balanceOf[account];
+    }
+
+    function getTotalDelegateStaked(address account) external view returns (uint256) {
+        return totalSupply;
+    }
+
     function delegateStake(address account, uint256 amount) external {
         balanceOf[account] += amount;
         totalSupply += amount;

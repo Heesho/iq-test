@@ -65,6 +65,11 @@ contract Curve is IEntropyConsumer, ReentrancyGuard, Ownable {
     mapping(uint256 => address) public score_Account;
     mapping(uint64 => address) public sequence_Account;
 
+    struct Score {
+        uint256 score;
+        address account;
+    }
+
     error Curve__InvalidAccount();
     error Curve__InvalidSequence();
     error Curve__InvalidScore();
@@ -259,12 +264,12 @@ contract Curve is IEntropyConsumer, ReentrancyGuard, Ownable {
         return IRewardVault(rewardVault).getTotalDelegateStaked(address(this));
     }
 
-    function getCurve() public view returns (address[] memory) {
-        address[] memory result = new address[](MAX_SCORE - MIN_SCORE);
-        for (uint256 i = MIN_SCORE; i < MAX_SCORE; i++) {
-            result[i - MIN_SCORE] = score_Account[i];
+    function getCurve() public view returns (Score[] memory) {
+        Score[] memory results = new Score[](MAX_SCORE - MIN_SCORE + 1);
+        for (uint256 i = MIN_SCORE; i <= MAX_SCORE; i++) {
+            results[i - MIN_SCORE] = Score(i, score_Account[i]);
         }
-        return result;
+        return results;
     }
 
     function getScores(uint256 start, uint256 end) public view returns (uint256[] memory) {
